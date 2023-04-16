@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Random Image</string>
+    <string name="width">width</string>
+    <string name="height">height</string>
+    <string name="type">type</string>
+    <string name="back_button">Back</string>
+</resources>

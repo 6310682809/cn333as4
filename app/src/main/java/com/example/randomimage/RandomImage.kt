@@ -40,7 +40,10 @@ var message = ""
 fun ScreenDisplay() {
     var width by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
-//    var message by remember { mutableStateOf("") }
+    var check by remember { mutableStateOf(false) }
+    val i_width = width.toIntOrNull() ?: 0
+    val i_height = height.toIntOrNull() ?: 0
+    var type by remember { mutableStateOf("") }
 
     Column {
         val navController = rememberNavController()
@@ -87,20 +90,21 @@ fun ScreenDisplay() {
                             fontSize = 20.sp,
                             modifier = Modifier.padding(20.dp)
                         )
-                        DropDownMenu()
+                        DropDownMenu(onChange = { type = it })
+                        check = checkInput(i_width, i_height, type)
 //                        val check = checkInput((if(width.isEmpty()) 0 else width.toInt()), (if(height.isEmpty()) 0 else width.toInt()))
-//                        Text(
-//                            text = message,
-//                            style = MaterialTheme.typography.h4,
-//                            fontSize = 20.sp,
-//                            color = Color.Red,
-//                            modifier = Modifier.padding(20.dp)
-//                        )
-//                        if(check){
+                        Text(
+                            text = message,
+                            style = MaterialTheme.typography.h4,
+                            fontSize = 20.sp,
+                            color = Color.Red,
+                            modifier = Modifier.padding(20.dp)
+                        )
+                        if(check){
                             Button(modifier = Modifier.padding(20.dp), onClick = { navController.navigate(RandomImageGameScreen.Image.name) }) { Text("SUBMIT") }
-//                        } else{
-//                            Button(modifier = Modifier.padding(20.dp), onClick = {}) { Text("SUBMIT") }
-//                        }
+                        } else{
+                            Button(modifier = Modifier.padding(20.dp), onClick = {}) { Text("SUBMIT") }
+                        }
                     }
                 }
                 composable(route = RandomImageGameScreen.Image.name) {
@@ -111,13 +115,12 @@ fun ScreenDisplay() {
     }
 }
 
-@Composable
-fun checkInput(width: Int, height: Int):Boolean {
+fun checkInput(width: Int, height: Int, type: String):Boolean {
     if ((8 > width || width > 2000 ) || (8 > height || height > 2000 )){
         message = "The width and height must in the range of 8-2000."
         return false
     }
-    else if(selectedText.isEmpty()) {
+    else if(type == "") {
         message = "Please select a type"
         return  false
     } else{
@@ -167,11 +170,11 @@ fun DisplayImage(width: Int, height: Int, type: String) {
 }
 
 @Composable
-fun DropDownMenu() {
+fun DropDownMenu(
+    onChange: (String) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     val suggestions = listOf("movie", "game", "album", "book", "face", "fashion", "shoes", "watch", "furniture")
-//    var selectedText by remember { mutableStateOf("") }
-
     var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
     val icon = if (expanded)
@@ -182,14 +185,14 @@ fun DropDownMenu() {
     Column(Modifier.padding(20.dp)) {
         OutlinedTextField(
             value = selectedText,
-            onValueChange = { selectedText = it },
+            onValueChange = {  selectedText = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     //This value is used to assign to the DropDown the same width
                     textfieldSize = coordinates.size.toSize()
                 },
-            label = { Text("Label") },
+            label = { Text("type") },
             trailingIcon = {
                 Icon(icon,"contentDescription",
                     Modifier.clickable { expanded = !expanded })
@@ -205,6 +208,7 @@ fun DropDownMenu() {
                 DropdownMenuItem(onClick = {
                     selectedText = label
                     expanded = false
+                    onChange(selectedText)
                 }) {
                     Text(text = label)
                 }
